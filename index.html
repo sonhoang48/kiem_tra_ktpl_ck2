@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn tập Cuối kì 2 - môn GD KT-PL (Bài 17 - Bài 21)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        /* Menu Screens */
+        #menu-screen { text-align: center; padding: 40px 20px; }
+        .mode-btn {
+            display: inline-block; width: 45%; margin: 10px; padding: 20px;
+            font-size: 1.2em; font-weight: bold; color: white;
+            border: none; border-radius: 10px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .mode-btn:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+        .btn-mode1 { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .btn-mode2 { background: linear-gradient(135deg, #e67e22, #d35400); }
+        
+        .header-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px;
+        }
+        .btn-back { background: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;}
+        .btn-back:hover { background: #7f8c8d; }
+
+        /* Shared Quiz CSS */
+        .question-block { margin-bottom: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa; }
+        .question-title { font-weight: bold; font-size: 1.1em; margin-bottom: 15px; color: #2c3e50; white-space: pre-wrap; }
+        .options label { display: block; margin-bottom: 10px; padding: 10px; background: #e9ecef; border-radius: 5px; cursor: pointer; transition: background 0.3s; border: 2px solid transparent;}
+        .options label:hover { background: #dbe2e8; }
+        input[type="radio"] { margin-right: 10px; }
+        
+        /* Mode 1 specific */
+        .tf-statement { margin-bottom: 15px; padding: 15px; background: #e9ecef; border-radius: 5px; }
+        .tf-statement p { margin: 0 0 10px 0; font-weight: 500; }
+        .tf-options { display: flex; gap: 20px; }
+        .tf-options label { flex: 1; text-align: center; margin: 0; padding: 8px; background: #fff; border: 1px solid #ccc; }
+
+        .btn-submit { display: block; width: 100%; padding: 15px; font-size: 1.2em; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 30px; font-weight: bold; }
+        
+        /* Mode 2 specific */
+        #mode2-progress { font-weight: bold; color: #e67e22; font-size: 1.2em; }
+        .m2-controls { margin-top: 20px; text-align: right; }
+        .btn-m2 { padding: 10px 25px; font-size: 1.1em; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+        .btn-check { background-color: #3498db; }
+        .btn-next { background-color: #2ecc71; display: none; }
+        .m2-feedback { margin-top: 15px; padding: 15px; border-radius: 5px; font-weight: bold; display: none; }
+        .m2-correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .m2-incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Helpers */
+        .correct { background-color: #d4edda !important; border-color: #2ecc71 !important; }
+        .incorrect { background-color: #f8d7da !important; border-color: #e74c3c !important; }
+        
+        .result-box { text-align: center; margin-top: 20px; padding: 20px; background-color: #e8f8f5; border: 2px solid #2ecc71; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ôn tập Cuối kì 2 - GD KT-PL (Bài 17 - 21)</h1>
+    
+    <div id="menu-screen">
+        <h2>Chọn chế độ ôn tập</h2>
+        <button class="mode-btn btn-mode1" onclick="startMode1()">Cách 1: Thi Thử<br><span style="font-size:0.7em; font-weight:normal;">Làm 1 lèo xong nộp bài</span></button>
+        <button class="mode-btn btn-mode2" onclick="startMode2()">Cách 2: Luyện Tập (Quizizz)<br><span style="font-size:0.7em; font-weight:normal;">Làm từng câu, sai bắt làm lại</span></button>
+    </div>
+
+    <div id="mode1-screen" style="display: none;">
+        <div class="header-controls">
+            <button class="btn-back" onclick="goHome()">⬅ Quay lại Menu</button>
+            <h3 style="margin:0; color:#2980b9;">Chế độ: Thi Thử</h3>
+        </div>
+        <div id="quiz-container"></div>
+        <h2>PHẦN II. CÂU TRẮC NGHIỆM ĐÚNG SAI</h2>
+        <div id="tf-container"></div>
+        <button class="btn-submit" id="btn-submit" onclick="submitMode1()">Nộp bài & Xem kết quả</button>
+        <div id="result1" class="result-box" style="display:none;"></div>
+    </div>
+
+    <div id="mode2-screen" style="display: none;">
+        <div class="header-controls">
+            <button class="btn-back" onclick="goHome()">⬅ Dừng & Quay lại Menu</button>
+            <span id="mode2-progress">Câu 1 / 10</span>
+        </div>
+        
+        <div id="m2-question-container">
+            </div>
+
+        <div id="m2-feedback" class="m2-feedback"></div>
+
+        <div class="m2-controls">
+            <button id="btn-m2-check" class="btn-m2 btn-check" onclick="checkMode2Answer()">Kiểm tra</button>
+            <button id="btn-m2-next" class="btn-m2 btn-next" onclick="nextMode2Question()">Tiếp theo ➡</button>
+        </div>
+
+        <div id="result2" class="result-box" style="display:none; margin-top:30px;"></div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu Trắc nghiệm nhiều lựa chọn (MCQ) - Đã cập nhật từ file PDF
+    function getOriginalQuizData() {
+        return [
+            // ================= BÀI 17 =================
+            { q: "Bài 17 - Câu 1: Pháp luật là hệ thống các quy tắc xử sự chung do nhà nước ban hành và được đảm bảo thực hiện bằng:", options: ["A. sức mạnh chuyên chính.", "B. tiềm lực tài chính quốc gia.", "C. quyền lực nhà nước.", "D. tính tự giác của nhân dân."], answer: 2 },
+            { q: "Bài 17 - Câu 2: Luật hôn nhân gia đình quy định điều kiện kết hôn giữa nam và nữ áp dụng cho tất cả mọi người, không có ngoại lệ phản ánh đặc điểm cơ bản nào của pháp luật?", options: ["A. Tính xác định chặt chẽ về nội dung.", "B. Tính xác định chặt chẽ về hình thức.", "C. Tính quyền lực, bắt buộc chung.", "D. Tính quy phạm phổ biến."], answer: 3 },
+            { q: "Bài 17 - Câu 3: Những quy tắc xử sự chung được áp dụng nhiều lần, ở nhiều nơi đối với tất cả mọi người là thể hiện đặc điểm nào dưới đây của pháp luật?", options: ["A. Tính chặt chẽ về hình thức.", "B. Tính kỉ luật nghiêm minh.", "C. Tính quy phạm phổ biến.", "D. Tính quyền lực, bắt buộc chung."], answer: 2 },
+            { q: "Bài 17 - Câu 4: Những người có hành vi không đúng quy định của pháp luật sẽ bị cơ quan có thẩm quyền áp dụng các biện pháp cần thiết để buộc họ phải tuân theo. Điều này thể hiện đặc điểm nào?", options: ["A. Tính quy phạm phổ biến.", "B. Tính quyền lực, bắt buộc chung.", "C. Hiệu lực tuyệt đối.", "D. Khả năng đảm bảo thi hành cao."], answer: 1 },
+            { q: "Bài 17 - Câu 5: Cục thông tin và truyền thông đã quyết định xử phạt việc chị T có hành vi đăng tải thông tin trái thuần phong mỹ tục... Việc làm này thể hiện đặc điểm nào của pháp luật?", options: ["A. Tính quyền lực bắt buộc chung.", "B. Tính quy phạm phổ biến.", "C. Tính chặt chẽ về hình thức.", "D. Tính kỉ luật nghiêm minh."], answer: 0 },
+            { q: "Bài 17 - Câu 6: Tất cả mọi cá nhân, tổ chức nếu vi phạm pháp pháp luật đều phải bị xử lý như nhau. Điều đó thể hiện đặc điểm nào dưới đây của pháp luật?", options: ["A. Tính quyền lực bắt buộc chung.", "B. Tính công khai.", "C. Tính dân chủ.", "D. Tính qui phạm phổ biến."], answer: 3 },
+            { q: "Bài 17 - Câu 7: Theo quy định của pháp luật, văn bản nào sau đây có hiệu lực pháp lý cao nhất?", options: ["A. Nghị định.", "B. Chỉ thị.", "C. Hiến pháp.", "D. Thông tư."], answer: 2 },
+            { q: "Bài 17 - Câu 8: Nhờ có pháp luật, nhà nước mới kiểm tra, kiểm soát được các hoạt động của mọi cá nhân... nhằm ổn định trật tự, đảm bảo sự phát triển bền vững. Nhận định này muốn đề cập đến:", options: ["A. Đặc trưng của pháp luật.", "B. Chức năng của pháp luật.", "C. Vai trò của pháp luật.", "D. Nhiệm vụ của pháp luật."], answer: 2 },
+            { q: "Bài 17 - Câu 9: Pháp luật có vai trò như thế nào đối với công dân?", options: ["A. Cưỡng chế mọi nghĩa vụ của công dân.", "B. Bảo vệ mọi nhu cầu, lợi ích của công dân.", "C. Bảo vệ quyền, lợi ích tuyệt đối của công dân.", "D. Bảo vệ quyền và lợi ích hợp pháp của công dân."], answer: 3 },
+            { q: "Bài 17 - Câu 10: Để quản lí xã hội bằng pháp luật một cách hiệu quả trên quy mô toàn xã hội... Nhà nước cần phải làm gì?", options: ["A. Ban hành và tổ chức thực hiện pháp luật.", "B. Tăng cường xử phạt thật nặng mọi người.", "C. Tổ chức tốt lực lượng xử phạt người dân.", "D. Ban hành và tổ chức phát triển kinh tế."], answer: 0 },
+            { q: "Bài 17 - Câu 11: Văn bản pháp luật đòi hỏi phải được diễn đạt chính xác và chặt chẽ về mặt hình thức để người dân hiểu và thực hiện đúng là đặc điểm nào?", options: ["A. Tính quyền lực bắt buộc chung.", "B. Tính xác định chặt chẽ về hình thức.", "C. Tính quy phạm phổ biến.", "D. Tính cưỡng chế."], answer: 1 },
+            { q: "Bài 17 - Câu 12: Nội dung của văn bản luật cấp dưới không được trái với nội dung của văn bản luật cấp trên và tất cả không được trái với Hiến pháp. Thể hiện đặc trưng nào?", options: ["A. Tính bắt buộc chung.", "B. Tính quy phạm phổ biến.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính cưỡng chế."], answer: 2 },
+            { q: "Bài 17 - Câu 13: Đặc điểm nào sau đây của pháp luật làm nên các quy tắc xử sự chung. Bất kì ai ở trong điều kiện, hoàn cảnh nhất định cũng phải xử sự theo khuôn mẫu?", options: ["A. Tính xác định chặt chẽ về hình thức.", "B. Tính xác định chặt chẽ về nội dung.", "C. Tính quy phạm phổ biến.", "D. Tính quyền lực, bắt buộc chung."], answer: 2 },
+            { q: "Bài 17 - Câu 14: Đặc điểm nào sau đây của pháp luật là yếu tố quan trọng để phân biệt pháp luật với các loại quy phạm xã hội khác như đạo đức, tập quán?", options: ["A. Tính điều chỉnh quan hệ xã hội.", "B. Tính quy phạm phổ biến.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính xác định chặt chẽ về nội dung."], answer: 1 },
+            { q: "Bài 17 - Câu 15: Việc Tòa án xử lý vi phạm của công ty A do chậm thanh toán đơn hàng là thể hiện đặc điểm nào dưới đây của pháp luật?", options: ["A. Tính thực tiễn xã hội.", "B. Tính quyền lực, bắt buộc chung.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính quy phạm phổ biến."], answer: 1 },
+            { q: "Bài 17 - Câu 16: Cảnh sát giao thông đã xử phạt những người vi phạm giao thông để đảm bảo trật tự. Pháp luật đã thể hiện vai trò gì đối với đời sống xã hội?", options: ["A. Là công cụ để bảo vệ trật tự an toàn giao thông.", "B. Là phương tiện để nhà nước quản lí xã hội.", "C. Là công cụ để nhân dân đấu tranh với người vi phạm.", "D. Là phương tiện để nhà nước trừng trị kẻ phạm tội."], answer: 1 },
+            { q: "Bài 17 - Câu 17: Dấu hiệu nào sau đây của pháp luật là một trong những đặc điểm để phân biệt pháp luật với đạo đức?", options: ["A. Tính quyền lực, bắt buộc chung.", "B. Tính quy phạm phổ biến.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính xác định chặt chẽ về nội dung."], answer: 0 },
+            { q: "Bài 17 - Câu 19: Những quy tắc xử sự chung về những việc được làm, những việc phải làm, những việc không được làm, những việc cấm đoán là phản ánh nội dung của khái niệm nào?", options: ["A. Kinh tế.", "B. Đạo đức.", "C. Pháp luật.", "D. Chính trị."], answer: 2 },
+            { q: "Bài 17 - Câu 20: Pháp luật có vai trò như thế nào đối với công dân?", options: ["A. Bảo vệ quyền và lợi ích hợp pháp của công dân.", "B. Bảo vệ quyền, lợi ích tuyệt đối của công dân.", "C. Cưỡng chế mọi nghĩa vụ của công dân.", "D. Bảo vệ mọi nhu cầu, lợi ích của công dân."], answer: 0 },
+            { q: "Bài 17 - Câu 21: Gia đình ông Q bị Chủ tịch UBND xã ra quyết định phá dỡ... Ông Q khiếu nại và được giải quyết. Pháp luật đã thể hiện vai trò gì đối với công dân?", options: ["A. Là phương tiện để nhà nước trừng trị kẻ phạm tội.", "B. Là công cụ để nhân dân đấu tranh với người vi phạm.", "C. Là công cụ để bảo vệ trật tự an toàn giao thông.", "D. Là phương tiện để bảo vệ quyền và lợi ích hợp pháp."], answer: 3 },
+            { q: "Bài 17 - Câu 22: Theo quy định của pháp luật, nội dung nào dưới đây thể hiện vai trò quản lí xã hội bằng pháp luật của nhà nước?", options: ["A. Đăng nhập cổng thông tin quốc gia.", "B. Tự do đăng ký kết hôn theo quy định.", "C. Chấn chỉnh việc kinh doanh trái phép.", "D. Ca ngợi phong trào phòng chống dịch."], answer: 2 },
+            { q: "Bài 17 - Câu 23: Chị P viện dẫn Luật HNGĐ để thuyết phục bố cho phép kết hôn với anh K. Pháp luật đã thể hiện vai trò nào dưới đây đối với công dân?", options: ["A. Là phương tiện để mọi người đấu tranh trong những trường hợp cần thiết.", "B. Là yếu tố liên quan đến cuộc sống gia đình.", "C. Là yếu tố điều chỉnh suy nghĩ của mọi người.", "D. Là phương tiện để công dân bảo vệ quyền và lợi ích hợp pháp của mình."], answer: 3 },
+            { q: "Bài 17 - Câu 24: Nhờ chị S có hiểu biết về pháp luật nên tranh chấp về đất đai đã được giải quyết ổn thỏa. Trường hợp này cho thấy pháp luật đã thể hiện vai trò nào?", options: ["A. Bảo vệ quyền và lợi ích hợp pháp của công dân.", "B. Bảo vệ quyền tham gia và quản lý xã hội.", "C. Bảo vệ quyền và tiêu sản của công dân.", "D. Bảo vệ quyền dân chủ của công dân."], answer: 0 },
+            { q: "Bài 17 - Câu 25: Chị B làm đơn khiếu nại khi bị chuyển công tác sau thai sản và được giải quyết thỏa đáng là nhờ vào đâu?", options: ["A. Đặc trưng của pháp luật.", "B. Vai trò của pháp luật.", "C. Đặc điểm của pháp luật.", "D. Yêu cầu của pháp luật."], answer: 1 },
+            { q: "Bài 17 (Tình huống) - Câu 1: Anh T đi xe máy vượt đèn đỏ bị cảnh sát lập biên bản xử phạt. Việc này thể hiện tính:", options: ["A. nhân văn, nhân ái.", "B. quyền lực nhà nước.", "C. quy phạm phổ biến.", "D. lợi ích cá nhân."], answer: 1 },
+            { q: "Bài 17 (Tình huống) - Câu 2: Vai trò quản lý xã hội của pháp luật được thể hiện như thế nào trong thông tin trên?", options: ["A. Bảo vệ quyền lợi của công dân.", "B. Điều chỉnh hành vi của công dân.", "C. Xác nhận tư cách quyền công dân.", "D. Xâm phạm lợi ích của công dân."], answer: 1 },
+            { q: "Bài 17 (Tình huống) - Câu 3: Việc cảnh sát giao thông tiến hành lập biên bản xử phạt những người vi phạm phản ánh vai trò nào dưới đây của pháp luật?", options: ["A. Bảo vệ quyền lợi của công dân.", "B. Xác nhận các quyền công dân.", "C. Quản lý xã hội.", "D. Tính quyền lực chung."], answer: 2 },
+            { q: "Bài 17 (Tình huống) - Câu 4: Mọi công dân có trách nhiệm chấp hành tín hiệu điều khiển giao thông là thể hiện đặc điểm nào?", options: ["A. Tính quy phạm phổ biên.", "B. Tính quyền lực bắt buộc chung.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính xã hội hóa toàn diện."], answer: 0 },
+            { q: "Bài 17 (Tình huống) - Câu 5: Việc cảnh sát giao thông tiến hành lập biên bản xử phạt anh T thể hiện đặc điểm nào dưới đây của pháp luật?", options: ["A. Tính quy phạm phổ biển.", "B. Tính quyền lực bắt buộc chung.", "C. Tính xác định chặt chẽ về hình thức.", "D. Tính xã hội hóa toàn diện."], answer: 1 },
+
+            // ================= BÀI 18 =================
+            { q: "Bài 18 - Câu 1: Tổng thể các quy phạm pháp luật có mối liên hệ mật thiết và thống nhất với nhau được phân định thành các ngành luật, chế định pháp luật được gọi là gì?", options: ["A. Hệ thống pháp luật.", "B. Hệ thống tư pháp.", "C. Quy phạm pháp luật.", "D. Văn bản dưới luật."], answer: 0 },
+            { q: "Bài 18 - Câu 2: Nội dung nào dưới đây là một trong những yếu tố cấu thành cấu trúc bên trong của hệ thống pháp luật Việt Nam?", options: ["A. Ngành luật, chế định pháp luật, quy phạm pháp luật.", "B. Pháp lệnh, Nghị định, Ngành luật.", "C. Quyết định, Lệnh, Thông tư.", "D. Chế định luật, Nghị quyết, Thông tư."], answer: 0 },
+            { q: "Bài 18 - Câu 3: Theo quy định của pháp luật, văn bản nào sau đây không phải văn bản luật?", options: ["A. Hiến pháp.", "B. Luật hành chính.", "C. Luật tố tụng dân sự.", "D. Biên bản xử phạt hành chính."], answer: 3 },
+            { q: "Bài 18 - Câu 4: Theo quy định của pháp luật, văn bản nào dưới đây là văn bản dưới luật?", options: ["A. Bộ luật Hình sự.", "B. Bộ luật Lao động.", "C. Luật hành chính.", "D. Nghị định chính phủ."], answer: 3 },
+            { q: "Bài 18 - Câu 5: Văn bản pháp luật nào sau đây có giá trị hiệu lực pháp lý cao nhất trong hệ thống văn bản pháp luật nước ta?", options: ["A. Hiến pháp.", "B. Nghị quyết của Quốc hội.", "C. Lệnh của Chủ tịch nước.", "D. Pháp lệnh."], answer: 0 },
+            { q: "Bài 18 - Câu 6: Những quy tắc xử sự chung do Nhà nước đặt ra hoặc thừa nhận... để điều chỉnh quan hệ xã hội được gọi là gì?", options: ["A. Quy phạm pháp luật.", "B. Chế định pháp luật.", "C. Ngành luật.", "D. Nghị định."], answer: 0 },
+            { q: "Bài 18 - Câu 7: Tập hợp các quy phạm pháp luật thuộc một ngành luật điều chỉnh một nhóm quan hệ xã hội cùng loại được gọi là gì?", options: ["A. Chế định pháp luật.", "B. Thông tư liên tịch.", "C. Nghị quyết liên tịch.", "D. Quy phạm pháp luật."], answer: 0 },
+            { q: "Bài 18 - Câu 8: Tập hợp các quy phạm pháp luật có đặc tính chung để điều chỉnh một lĩnh vực quan hệ xã hội nhất định... được gọi là gì?", options: ["A. Ngành luật.", "B. Chế định pháp luật.", "C. Quy phạm pháp luật.", "D. Cấu trúc pháp luật."], answer: 0 },
+            { q: "Bài 18 - Câu 9: Hình thức thể hiện bên ngoài của văn bản quy phạm pháp luật gồm:", options: ["A. Văn bản luật và văn bản dưới luật.", "B. Ngành luật.", "C. Chế định luật.", "D. Quy phạm pháp luật."], answer: 0 },
+            { q: "Bài 18 - Câu 10: Quyết định cưỡng chế công trình của Ủy ban nhân dân phường T thuộc loại văn bản quy phạm pháp luật nào dưới đây?", options: ["A. Văn bản dưới luật. (Áp dụng PL)", "B. Văn bản Luật.", "C. Văn bản ngang luật.", "D. Văn bản Điều lệ."], answer: 0 },
+            { q: "Bài 18 - Câu 11: Xét về cấu trúc của hệ thống pháp luật, luật hôn nhân và gia đình là loại văn bản quy phạm pháp luật nào dưới đây?", options: ["A. Văn bản Luật.", "B. Văn bản dưới luật.", "C. Văn bản pháp quy.", "D. Văn bản giải thích."], answer: 0 },
+            { q: "Bài 18 - Câu 12: Văn bản áp dụng pháp luật là văn bản có chứa đựng các quy tắc xử sự mang tính:", options: ["A. cá biệt.", "B. trừu tượng.", "C. bất biến.", "D. chung chung."], answer: 0 },
+            { q: "Bài 18 - Câu 13: Trong hệ thống pháp luật Việt Nam, đơn vị nhỏ nhất, là cơ sở, nền tảng để cấu thành nên hệ thống pháp luật chung là gì?", options: ["A. Quy phạm pháp luật.", "B. Chế định pháp luật.", "C. Ngành luật.", "D. Hiến pháp."], answer: 0 },
+            { q: "Bài 18 - Câu 14: Các văn bản chứa đựng các quy phạm pháp luật, được ban hành theo đúng thẩm quyền, hình thức... được gọi là gì?", options: ["A. Văn bản quy phạm pháp luật.", "B. Văn bản áp dụng pháp luật.", "C. Văn bản hướng dẫn thi hành.", "D. Văn bản thực hiện pháp luật."], answer: 0 },
+            { q: "Bài 18 - Câu 15: Việc ban hành các văn bản quy phạm pháp luật phải được thực hiện theo đúng thẩm quyền... quy định trong văn bản nào sau đây?", options: ["A. Luật ban hành văn bản quy phạm pháp luật.", "B. Luật hành chính.", "C. Luật tố tụng hành chính.", "D. Hiến pháp."], answer: 0 },
+            { q: "Bài 18 - Câu 16: Văn bản dưới luật nào sau đây là thấp nhất trong sơ đồ hệ thống pháp luật Việt Nam?", options: ["A. Quyết định của ủy ban nhân dân cấp xã.", "B. Nghị quyết của HĐND cấp Tỉnh.", "C. Quyết định của UBND cấp Huyện.", "D. Nghị quyết của HĐND cấp Huyện."], answer: 0 },
+            { q: "Bài 18 - Câu 17: Một trong những đặc điểm của văn bản quy phạm pháp luật đó là việc ban hành phải được tiến hành theo hình thức, thủ tục do:", options: ["A. pháp luật quy định.", "B. người dân thống nhất.", "C. Đại hội thông qua.", "D. Quốc hội ủy quyền."], answer: 0 },
+            { q: "Bài 18 - Câu 18: Văn bản quy phạm pháp luật bao gồm văn bản luật và:", options: ["A. văn bản dưới luật.", "B. văn bản trên luật.", "C. văn bản thi hành.", "D. văn bản khảo sát."], answer: 0 },
+            { q: "Bài 18 - Câu 19: Văn bản áp dụng pháp luật nhằm giúp các cơ quan nhà nước có thẩm quyền căn cứ vào pháp luật để nhằm xác lập:", options: ["A. quyền và nghĩa vụ của cá nhân, tổ chức.", "B. những quan điểm trái chiều.", "C. tất cả nhu cầu của cá nhân.", "D. mọi giao dịch dân sự."], answer: 0 },
+            { q: "Bài 18 - Câu 20: Văn bản áp dụng pháp luật nhằm giúp các cơ quan nhà nước có thẩm quyền căn cứ vào pháp luật để xác định trách nhiệm pháp lí đối với:", options: ["A. chủ thể vi phạm pháp luật.", "B. những quan điểm trái chiều.", "C. tất cả nhu cầu của cá nhân.", "D. mọi giao dịch dân sự."], answer: 0 },
+            { q: "Bài 18 - Câu 21: Văn bản luật là văn bản do chủ thể nào dưới đây ban hành?", options: ["A. Quốc hội.", "B. Hội đồng nhân dân.", "C. Ủy ban nhân dân.", "D. Đảng Cộng sản."], answer: 0 },
+
+            // ================= BÀI 19 =================
+            { q: "Bài 19 - Câu 1: Hình thức thực hiện nào của pháp luật quy định cá nhân, tổ chức chủ động thực hiện nghĩa vụ, không chủ động thực hiện cũng bị bắt buộc phải thực hiện?", options: ["A. Thi hành pháp luật.", "B. Sử dụng pháp luật.", "C. Tuân thủ pháp luật.", "D. Áp dụng pháp luật."], answer: 0 },
+            { q: "Bài 19 - Câu 2: Quá trình hoạt động có mục đích làm cho những quy định của pháp luật đi vào cuộc sống, trở thành những hành vi hợp pháp... thuộc khái niệm nào?", options: ["A. Giáo dục pháp luật.", "B. Thực hiện pháp luật.", "C. Phổ biến pháp luật.", "D. Tư vấn pháp luật."], answer: 1 },
+            { q: "Bài 19 - Câu 3: Theo quy định của pháp luật, công dân KHÔNG tuân thủ pháp luật khi thực hiện hành vi nào sau đây?", options: ["A. Từ chối kê khai thông tin dịch tễ.", "B. Ủy quyền nghĩa vụ bầu cử.", "C. Hỗ trợ việc cấp đổi căn cước.", "D. Tổ chức đường dây nhập cảnh trái phép."], answer: 3 },
+            { q: "Bài 19 - Câu 4: Tòa án nhân dân tỉnh X đã tuyên phạt 36 năm tù đối với các bị cáo... Tòa án nhân dân tỉnh X đã thực hiện pháp luật theo hình thức nào?", options: ["A. Tuân thủ pháp luật.", "B. Thi hành pháp luật.", "C. Sử dụng pháp luật.", "D. Áp dụng pháp luật."], answer: 3 },
+            { q: "Bài 19 - Câu 5: Hành vi nào dưới đây thể hiện công dân sử dụng pháp luật?", options: ["A. Người kinh doanh trốn thuế phải nộp phạt.", "B. Công ty X thực hiện nghĩa vụ đóng thuế theo quy định pháp luật.", "C. Các bên tranh chấp phải thực hiện các quyền và nghĩa vụ của mình.", "D. Anh A được kinh doanh trong những ngành nghề mà pháp luật không cấm."], answer: 3 },
+            { q: "Bài 19 - Câu 6: Hình thức thực hiện pháp luật nào dưới đây có sự tham gia của cơ quan, công chức nhà nước có thẩm quyền?", options: ["A. Sử dụng pháp luật.", "B. Tuân thủ pháp luật.", "C. Áp dụng pháp luật.", "D. Thi hành pháp luật."], answer: 2 },
+            { q: "Bài 19 - Câu 7: Cá nhân, tổ chức không làm những điều mà pháp luật cấm là thực hiện pháp luật theo hình thức nào?", options: ["A. Áp dụng pháp luật.", "B. Tuân thủ pháp luật.", "C. Sử dụng pháp luật.", "D. Thi hành pháp luật."], answer: 1 },
+            { q: "Bài 19 - Câu 8: Công dân thi hành pháp luật khi thực hiện hành vi nào sau đây?", options: ["A. Thay đổi quyền nhân thân.", "B. Bảo vệ Tổ quốc.", "C. Bảo trợ người khuyết tật.", "D. Hiến máu nhân đạo."], answer: 1 },
+            { q: "Bài 19 - Câu 9: Người kinh doanh thực hiện nghĩa vụ nộp thuế là hình thức thực hiện pháp luật nào dưới đây?", options: ["A. Tuân thủ pháp luật.", "B. Ap dụng pháp luật.", "C. Sử dụng pháp luật.", "D. Thi hành pháp luật."], answer: 3 },
+            { q: "Bài 19 - Câu 10: Khi tham gia vào các quan hệ xã hội, công dân đều xử sự phù hợp với quy định của pháp luật là nội dung của khái niệm nào?", options: ["A. Ban hành pháp luật.", "B. Giáo dục pháp luật.", "C. Phổ biến pháp luật.", "D. Thực hiện Pháp luật."], answer: 3 },
+            { q: "Bài 19 - Câu 11: Hình thức thực hiện pháp luật nào dưới đây có chủ thể thực hiện khác với các hình thức còn lại?", options: ["A. Áp dụng pháp luật.", "B. Sử dụng pháp luật.", "C. Thi hành pháp luật.", "D. Tuân thủ pháp luật."], answer: 0 },
+            { q: "Bài 19 - Câu 12: Hình thức thực hiện nào của pháp luật quy định cá nhân, tổ chức sử dụng đúng các quyền của mình, làm những gì pháp luật cho phép?", options: ["A. Sử dụng pháp luật.", "B. Thi hành pháp luật.", "C. Tuân thủ pháp luật.", "D. Áp dụng pháp luật."], answer: 0 },
+            { q: "Bài 19 - Câu 13: Theo quy định của pháp luật, công dân tuân thủ pháp luật khi thực hiện hành vi nào sau đây?", options: ["A. Không tàng trữ các chất cấm theo qui định của pháp luật.", "B. Đăng ký nghĩa vụ quân sự khi đến tuổi.", "C. Tố cáo người nhập cảnh trái phép.", "D. Cung cấp thông tin người nhập cảnh trái phép."], answer: 0 },
+            { q: "Bài 19 - Câu 14: Người vi phạm pháp luật bị các cơ quan nhà nước có thẩm quyền xét xử... là hình thức thực hiện pháp luật nào sau đây?", options: ["A. Áp dụng pháp luật.", "B. Tuân thủ pháp luật.", "C. Sử dụng pháp luật.", "D. Thi hành pháp luật."], answer: 0 },
+            { q: "Bài 19 - Câu 15: Cơ quan nhà nước, nhà chức trách có thẩm quyền đã áp dụng pháp luật khi đưa ra các quyết định nào sau đây?", options: ["A. Thay đổi nội dung di chúc.", "B. Ủy quyền giao nhận hàng hóa.", "C. Xóa bỏ các loại cạnh tranh.", "D. Thu hồi giấy phép kinh doanh."], answer: 3 },
+            { q: "Bài 19 (Tình huống) - Câu 1: Việc bà Y và bà D cùng hoàn thiện hồ sơ để được cấp phép hoạt động kinh doanh là thực hiện pháp luật hình thức nào?", options: ["A. Thi hành pháp luật.", "B. Tuân thủ pháp luật.", "C. Sử dụng pháp luật.", "D. Áp dụng pháp luật."], answer: 2 },
+            { q: "Bài 19 (Tình huống) - Câu 2: Hành vi xả chất thải chưa qua xử lý ra môi trường vi phạm Điều 91 (Cấm xả nước thải...). Vậy họ chưa thực hiện pháp luật ở hình thức nào?", options: ["A. Thi hành pháp luật.", "B. Tuân theo pháp luật (Tuân thủ).", "C. Sử dụng pháp luật.", "D. Áp dụng pháp luật."], answer: 1 },
+            { q: "Bài 19 (Tình huống) - Câu 3: Việc làm của chủ thể nào trong thông tin trên là biểu hiện của hình thức áp dụng pháp luật?", options: ["A. Bà Y.", "B. Bà D.", "C. Ông N.", "D. Ông T."], answer: 2 },
+            { q: "Bài 19 (Tình huống) - Câu 4: Việc người dân gửi đơn tới cơ quan chức năng để trình bày sự việc là đã thực hiện pháp luật hình thức nào?", options: ["A. Thi hành pháp luật.", "B. Tuân thủ pháp luật.", "C. Sử dụng pháp luật.", "D. Áp dụng pháp luật."], answer: 2 },
+
+            // ================= BÀI 20 =================
+            { q: "Bài 20 - Câu 1: Hệ thống các quy phạm pháp luật có hiệu lực pháp lí cao nhất quy định những vấn đề cơ bản nhất về chủ quyền quốc gia... là khái niệm nào?", options: ["A. Hiến pháp.", "B. Luật hành chính.", "C. Luật lao động.", "D. Luật hình sự."], answer: 0 },
+            { q: "Bài 20 - Câu 2: Trong lịch sử lập hiến, nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam đã ban hành các bản Hiến pháp nào dưới đây?", options: ["A. Hiến pháp 1946, 1959, 1980, 1992, 2013.", "B. Hiến pháp 1946, 1960, 1980, 1992, 2013.", "C. Hiến pháp 1946, 1959, 1981, 1992, 2013.", "D. Hiến pháp 1946, 1959, 1980, 1993, 2013."], answer: 0 },
+            { q: "Bài 20 - Câu 3: Trong hệ thống pháp luật nước Cộng hòa xã hội chủ nghĩa Việt Nam, văn bản pháp luật nào có giá trị pháp lý cao nhất?", options: ["A. Hiến pháp.", "B. Luật nhà nước.", "C. Luật tổ chức Quốc hội.", "D. Luật tổ chức Hội đồng nhân dân."], answer: 0 },
+            { q: "Bài 20 - Câu 4: Căn cứ Hiến pháp 2013, Quốc hội ban hành Bộ luật Lao động năm 2019. Nội dung trên thể hiện Hiến pháp là cơ sở để:", options: ["A. ban hành các văn bản pháp luật khác.", "B. cụ thể hóa các nội dung của luật khác.", "C. xử phạt mọi hành vi vi phạm pháp luật.", "D. dung hòa các mối quan hệ trong xã hội."], answer: 0 },
+            { q: "Bài 20 - Câu 5: Điều 20 Hiến pháp 2013 quy định: Mọi người có quyền bất khả xâm phạm về thân thể... Thể hiện đặc điểm nào của Hiến pháp?", options: ["A. Hiến pháp có tính ổn định lâu dài.", "B. Hiến pháp là đạo luật cơ bản của Nhà nước.", "C. Hiến pháp có hiệu lực pháp lí lâu dài.", "D. Hiến pháp có quy trình sửa đổi đặc biệt."], answer: 1 },
+            { q: "Bài 20 - Câu 6: Bản Hiến pháp có giá trị pháp lý của nước ta hiện nay được ban hành năm nào?", options: ["A. 2013.", "B. 1980.", "C. 1992.", "D. 2001."], answer: 0 },
+            { q: "Bài 20 - Câu 7: Hiến pháp nước Cộng hòa xã hội chủ nghĩa Việt Nam là văn bản quy phạm pháp luật do cơ quan nào ban hành?", options: ["A. Chủ tịch nước ban hành.", "B. Quốc hội ban hành.", "C. Thủ tướng chính phủ giới thiệu.", "D. Mặt trận tổ quốc ban hành."], answer: 1 },
+            { q: "Bài 20 - Câu 8: Việc làm nào dưới đây KHÔNG thể hiện trách nhiệm của công dân trong việc thực hiện nghĩa vụ tuân thủ Hiến pháp?", options: ["A. Tích cực tìm hiểu nội dung các quy định của Hiến pháp.", "B. Nghiêm chỉnh, tự giác thực hiện các quy định của Hiến pháp.", "C. Tích cực tuyên truyền, đấu tranh chống các hành vi vi phạm Hiến pháp.", "D. Gây rối an tự trong khu dân cư."], answer: 3 },
+            { q: "Bài 20 - Câu 9: Hiến pháp nước Cộng hòa xã hội chủ nghĩa Việt Nam KHÔNG có đặc điểm nào dưới đây?", options: ["A. Luật cơ bản của nước ta.", "B. Có hiệu lực pháp lí cao nhất.", "C. Quy định những vấn đề cơ bản và quan trọng.", "D. Quy định chi tiết nội dung của Hợp đồng lao động."], answer: 3 },
+            { q: "Bài 20 - Câu 10: Mọi người có quyền hiến một bộ phận cơ thể người và hiến xác theo quy định của luật... Quy định trên thể hiện đặc điểm (hoặc quyền) nào?", options: ["A. Quyền giáo dục.", "B. Quyền con người.", "C. Quyền kinh tế.", "D. Quyền đi học."], answer: 1 },
+            { q: "Bài 20 - Câu 11: Việc Quốc hội ban hành Luật giáo dục 2019 để cụ thể hóa một số nội dung cơ bản của Hiến pháp 2013 là thể hiện đặc điểm nào?", options: ["A. Hiến pháp là đạo luật cơ bản của nhà nước.", "B. Hiến pháp có hiệu lực pháp lý lâu dài.", "C. Hiến pháp có hiệu lực pháp lý tương đối ổn định.", "D. Hiến pháp có quy trình sửa đổi đặc biệt."], answer: 0 },
+            { q: "Bài 20 - Câu 12: Nội dung của Hiến pháp quy định về những nội dung cơ bản, quan trọng của đất nước vì vậy hiến pháp có hiệu lực pháp lý:", options: ["A. cụ thể.", "B. lâu dài.", "C. vĩnh viễn.", "D. vĩnh cửu."], answer: 1 },
+            { q: "Bài 20 - Câu 13: Nội dung của Hiến pháp quy định về những nội dung cơ bản, quan trọng của đất nước vì vậy nội dung của Hiến pháp mang tính:", options: ["A. tương đối ổn định.", "B. tượng trưng lâu dài.", "C. cố định và ổn định.", "D. ổn định và bất biến."], answer: 0 },
+            { q: "Bài 20 - Câu 14: Hiến pháp Nước Cộng hòa xã hội Chủ nghĩa Việt Nam năm 2013 có bao nhiêu chương và bao nhiêu điều?", options: ["A. 11 chương, 120 điều.", "B. 12 chương, 121 điều.", "C. 13 chương, 122 điều.", "D. 14 chương, 123 điều."], answer: 0 },
+            { q: "Bài 20 (Tình huống) - Câu 1: Việc nhà nước mở rộng các cơ sở đào tạo nghề và giải quyết việc làm... là thực hiện quan điểm nào của Hiến pháp?", options: ["A. Mọi công dân đều được hỗ trợ thu nhập và làm bất cứ nghề gì.", "B. Mọi công dân đều có quyền làm việc và lựa chọn nghề nghiệp.", "C. Mọi công dân đều có nghĩa vụ lao động để tạo ra thu nhập.", "D. Mọi công dân đều có quyền làm bất cứ ngành nghề gì."], answer: 1 },
+            { q: "Bài 20 (Tình huống) - Câu 2: Căn cứ vào Hiến pháp 2013 về vấn đề lao động và việc làm, Quốc hội đã ban hành Bộ luật nào dưới đây để triển khai?", options: ["A. Luật hôn nhân và gia đình.", "B. Bộ Luật lao động.", "C. Bộ Luật hình sự.", "D. Luật an toàn thông tin."], answer: 1 },
+            { q: "Bài 20 (Tình huống) - Câu 3: Những quy định của pháp luật về quyền lao động và việc làm trong Hiến pháp 2013 thể hiện đặc điểm nào?", options: ["A. Hiến pháp là luật cơ bản của nhà nước.", "B. Hiến pháp có tính ổn định, tương đối.", "C. Hiến pháp có trình tự ban hành đặc biệt.", "D. Hiến pháp có quy trình sửa đổi đặc biệt."], answer: 0 },
+
+            // ================= BÀI 21 =================
+            { q: "Bài 21 - Câu 1: Hiến pháp 2013 khẳng định chính thể Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là:", options: ["A. Cộng hòa xã hội chủ nghĩa.", "B. Dân chủ cộng hòa.", "C. Cộng hòa và phong kiến.", "D. Dân chủ và tập trung."], answer: 0 },
+            { q: "Bài 21 - Câu 2: Về chế độ chính trị, Hiến pháp 2013 đã khẳng định quyền lực của nhà nước là thuộc về:", options: ["A. Nhân dân.", "B. Chủ tịch nước.", "C. Chính phủ.", "D. Đảng Cộng sản."], answer: 0 },
+            { q: "Bài 21 - Câu 3: Về mặt tổ chức quyền lực, Hiến pháp 2013 quy định quyền lực nhà nước là thống nhất có sự phân công phối hợp... thực hiện các quyền:", options: ["A. lập pháp, hành pháp và tư pháp.", "B. lập pháp, lập hiến và lập nghiệp.", "C. tự do dân chủ.", "D. tập trung dân chủ."], answer: 0 },
+            { q: "Bài 21 - Câu 4: Theo Hiến pháp 2013, nước Cộng hoà xã hội chủ nghĩa Việt Nam là:", options: ["A. một nước độc lập, có chủ quyền, thống nhất và toàn vẹn lãnh thổ.", "B. một nước độc lập, tự do, có chủ quyền, thống nhất và toàn vẹn lãnh thổ.", "C. một nước xã hội chủ nghĩa, có chủ quyền, thống nhất và toàn vẹn lãnh thổ.", "D. một nước độc lập xã hội chủ nghĩa, có chủ quyền, thống nhất và toàn vẹn lãnh thổ."], answer: 0 },
+            { q: "Bài 21 - Câu 5: Hiến pháp 2013 khẳng định nhân dân Việt Nam thực hiện quyền lực nhà nước bằng hình thức dân chủ nào dưới đây?", options: ["A. Dân chủ trực tiếp và dân chủ gián tiếp (đại diện).", "B. Dân chủ trực tiếp và dân chủ xã hội.", "C. Dân chủ gián tiếp và dân chủ đại diện.", "D. Tập trung dân chủ."], answer: 0 },
+            { q: "Bài 21 - Câu 6: Đa dạng hóa, đa phương hóa quan hệ, chủ động và tích cực hội nhập, hợp tác quốc tế... là nội dung cơ bản của Hiến pháp 2013 về:", options: ["A. bản chất nhà nước.", "B. hình thức nhà nước.", "C. chính sách đối ngoại.", "D. mục tiêu đối ngoại."], answer: 2 },
+            { q: "Bài 21 - Câu 7: Cơ sở hình thành Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là:", options: ["A. Liên minh giữa giai cấp công nhân, giai cấp nông dân và đội ngũ trí thức.", "B. Liên minh giữa giai cấp công nhân với giới cấp nông dân.", "C. Liên minh giữa giai cấp công nhân và giai cấp thống trị.", "D. Liên minh giữa giai cấp công nhân với đội ngũ trí thức."], answer: 0 },
+            { q: "Bài 21 - Câu 8: Hiến pháp 2013 quy định, Đảng Cộng sản Việt Nam là lực lượng giữ vai trò như thế nào đối với Nhà nước và xã hội?", options: ["A. Lãnh đạo.", "B. Quản lý.", "C. Điều phối.", "D. Tập hợp."], answer: 0 },
+            { q: "Bài 21 - Câu 9: Theo nội dung của Hiến pháp 2013, Quốc kỳ nước Cộng hòa xã hội chủ nghĩa Việt Nam có hình chữ nhật trong đó chiều rộng bằng", options: ["A. một phần ba chiều dài.", "B. hai phần ba chiều dài.", "C. chiều dài.", "D. ba phần tư chiều dài."], answer: 1 },
+            { q: "Bài 21 - Câu 10: Hiến pháp năm 2013 quy định lãnh thổ nước Cộng hòa xã hội chủ nghĩa Việt Nam bao gồm:", options: ["A. Đất liền, vùng biển và vùng trời.", "B. Đất liền, vùng đất và vùng trời.", "C. Đất liền, hải đảo, vùng biển và vùng trời.", "D. Đất liền, vùng đất, vùng biển và vùng trời."], answer: 2 },
+            { q: "Bài 21 - Câu 11: Theo nội dung của Hiến pháp 2013, Quốc kỳ nước Cộng hòa xã hội chủ nghĩa Việt Nam có nền màu đỏ, ở giữa có:", options: ["A. ngôi sao vàng năm cánh.", "B. ngôi sao vàng ba cánh.", "C. cờ búa liềm.", "D. huy hiệu Đoàn."], answer: 0 },
+            { q: "Bài 21 - Câu 12: Theo nội dung của Hiến pháp 2013, Quốc khánh nước Cộng hòa xã hội chủ nghĩa Việt Nam là ngày tuyên ngôn Độc lập ngày", options: ["A. 2 tháng 9 năm 1945.", "B. 3 tháng 9 năm 1945.", "C. 19 tháng 12 năm 1945.", "D. 20 tháng 12 năm 1945."], answer: 0 },
+            { q: "Bài 21 - Câu 13: Theo nội dung của Hiến pháp 2013, Quốc huy nước Cộng hòa xã hội chủ nghĩa Việt Nam có dòng chữ:", options: ["A. Đảng cộng sản Việt Nam quang vinh.", "B. Cộng hòa xã hội chủ nghĩa Việt Nam.", "C. Đoàn thanh niên Cộng sản Hồ chí minh.", "D. Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam."], answer: 1 },
+            { q: "Bài 21 - Câu 14: Theo nội dung của Hiến pháp 2013, Quốc ca nước Cộng hòa xã hội chủ nghĩa Việt Nam là nhạc và lời của bài:", options: ["A. Tiến quân ca.", "B. Thanh niên làm theo lời Bác.", "C. Lên đàng.", "D. Bác đang cùng chúng cháu hành quân."], answer: 0 },
+            { q: "Bài 21 - Câu 15: Theo nội dung của Hiến pháp 2013, Thủ đô nước Cộng hòa xã hội chủ nghĩa Việt Nam là:", options: ["A. Hà Nội.", "B. Hồ Chí Minh.", "C. Hải Phòng.", "D. Đà Nẵng."], answer: 0 },
+            { q: "Bài 21 - Câu 16: Hiến pháp 2013 khẳng định bản chất của Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là nhà nước:", options: ["A. pháp quyền xã hội chủ nghĩa.", "B. pháp quyền dân chủ xã hội.", "C. chuyên chính tư sản.", "D. chuyên chính tư nhân."], answer: 0 },
+            { q: "Bài 21 - Câu 17: Tại khoản 2 Điều 2 Hiến pháp năm 2013 khẳng định Nước Cộng hòa xã hội chủ nghĩa Việt Nam do ai làm chủ?", options: ["A. Lực lượng tiến bộ.", "B. Đội ngũ trí thức.", "C. Giai cấp nông dân.", "D. Nhân dân."], answer: 3 },
+            { q: "Bài 21 - Câu 19: Hiến pháp 2013 khẳng định bản chất của Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là nhà nước pháp quyền xã hội chủ nghĩa tất cả quyền lực nhà nước thuộc về ai?", options: ["A. Nhân dân.", "B. Công nhân.", "C. Nông dân.", "D. Trí thức."], answer: 0 },
+            { q: "Bài 21 - Câu 20: Anh B tham gia xây dựng và hoàn thiện chế độ chính trị ở nước ta thể hiện ở hoạt động nào sau đây?", options: ["A. Tham gia các hoạt động xã hội", "B. Tích cực tham gia bảo vệ môi trường.", "C. Quyên góp ủng hộ lũ lụt.", "D. Tố cáo hành vi tham nhũng."], answer: 3 },
+            { q: "Bài 21 - Câu 21: (Tình huống bầu cử) Anh H đi bầu thay anh B, anh S đi bầu thay bà D, ông N bảo anh H và anh S bầu cho Y. Những ai đã thực hiện chưa tốt trách nhiệm của công dân?", options: ["A. Anh B, Anh H, anh S và ông N.", "B. Ông N, Y, anh H và anh S.", "C. Anh B, Anh H, anh S và bà D, ông N.", "D. Anh B, bà D."], answer: 0 },
+            { q: "Bài 21 - Câu 22: Hội đồng nhân dân xã B tổ chức họp để đánh giá hoạt động định kỳ... Việc làm này thể hiện bản chất nào dưới đây của chế độ chính trị ở nước ta?", options: ["A. Tính nhân dân.", "B. Tính quyền lực.", "C. Tính dân tộc.", "D. Bản chất giai cấp công nhân."], answer: 0 },
+            { q: "Bài 21 - Câu 23: Trong hội nghị tổng kết cuối năm, một số người dân xã S đã yêu cầu kế toán xã giải trình về khoản thu, chi... Người dân xã S đã thực hiện trách nhiệm ở nội dung nào?", options: ["A. Dân giám sát và kiểm tra.", "B. Dân hiểu và đồng tình.", "C. Dân thảo luận và góp ý kiến.", "D. Dân bàn và quyết định."], answer: 0 },
+            { q: "Bài 21 - Câu 25: Trong buổi họp dân cư tổ X, mọi người họp bàn và thống nhất mức góp tiền để xây dựng sân thể thao chung... Việc họp bàn thể hiện bản chất nào?", options: ["A. Dân chủ.", "B. Mệnh lệnh.", "C. Cá nhân.", "D. Áp đặt."], answer: 0 },
+            { q: "Bài 21 (Tình huống) - Câu 1: Để thể chế những quan điểm của Hiến pháp 2013 về chủ quyền lãnh thổ quốc gia, Quốc hội đã ban hành Luật nào dưới đây?", options: ["A. Luật Biên giới quốc gia.", "B. Luật Doanh nghiệp nước ngoài.", "C. Luật Hải quan.", "D. Luật tần số vô tuyến điện."], answer: 0 },
+            { q: "Bài 21 (Tình huống) - Câu 2: Việc giải quyết tốt vấn đề biên giới quốc gia cũng góp phần thực hiện tốt nội dung nào dưới đây của Hiến pháp 2013?", options: ["A. Chính sách kinh tế.", "B. Chính sách khoa học – công nghệ.", "C. Chính sách đối ngoại.", "D. Chính sách văn hóa."], answer: 2 },
+            { q: "Bài 21 (Tình huống) - Câu 3: Đối với vấn đề biên giới, đặc biệt là vấn đề chủ quyền biển đảo, Hiến pháp 2013 đã đề ra đường lối đối ngoại độc lập, tự chủ, hòa bình hữu nghị, các nước cùng:", options: ["A. tìm cách xâm chiếm nhau.", "B. áp đặt chủ quyền cho nhau.", "C. hợp tác và phát triển.", "D. gia tăng sự lệ thuộc."], answer: 2 }
+        ];
+    }
+
+    // Dữ liệu Trắc nghiệm Đúng/Sai - Đã cập nhật từ file PDF
+    function getTFQuizData() {
+        return [
+            {
+                q: "Bài 17 - Phát hiện vi phạm tại nhà hàng X do bà H làm chủ. Ông D lập biên bản xử phạt và thu hồi giấy phép kinh doanh của bà H.",
+                statements: [
+                    { text: "a) Bà H không phải là chủ thể sản xuất nên không có nghĩa vụ phải chấp hành các quy định của pháp luật.", answer: false },
+                    { text: "b) Ông D đã làm tốt vai trò là chủ thể nhà nước trong việc quản lý nhà nước đối với hoạt động kinh doanh.", answer: true },
+                    { text: "c) Việc xử phạt của cơ quan chức năng thể hiện tính quy phạm phổ biến của pháp luật.", answer: false },
+                    { text: "d) Anh M (khách bị ngộ độc) có quyền khởi kiện để yêu cầu bà H phải bồi thường thiệt hại cho bản thân mình.", answer: true }
+                ]
+            },
+            {
+                q: "Bài 18 - Xét Tờ trình của UBND tỉnh Hà Nam về việc đề nghị ban hành Nghị quyết... UBND tỉnh Hà Nam ban hành Nghị quyết...",
+                statements: [
+                    { text: "a) Luật ngân sách Nhà nước là một ngành luật trong hệ thống pháp luật Việt Nam.", answer: true },
+                    { text: "b) Thông tư của Bộ Văn hóa thể thao và du lịch không phải là văn bản pháp luật.", answer: false },
+                    { text: "c) Nghị quyết của Hội đồng nhân dân tỉnh là văn bản quy phạm pháp luật.", answer: true },
+                    { text: "d) Tờ trình của Ủy ban nhân dân tỉnh có giá trị như văn bản pháp luật.", answer: false }
+                ]
+            },
+            {
+                q: "Bài 19 - Sau khi tốt nghiệp, chị H hoàn thiện hồ sơ mở công ty. Hàng năm nộp thuế đầy đủ. Ông K làm hồ sơ đề nghị cấp trên khen thưởng...",
+                statements: [
+                    { text: "a) Việc mở công ty trách nhiệm hữu hạn một thành viên của chị H là biểu hiện của hình thức sử dụng pháp luật.", answer: true },
+                    { text: "b) Chị H hàng năm đều nộp thuế đầy đủ, đúng hạn là thực hiện hình thức thi hành pháp luật.", answer: true },
+                    { text: "c) Việc không bán hàng giả, hàng nhái là thể hiện hành vi áp dụng pháp luật của chị H.", answer: false },
+                    { text: "d) Việc làm của ông K là biểu hiện của việc áp dụng pháp luật.", answer: false }
+                ]
+            },
+            {
+                q: "Bài 20 - Theo Điều 27 của Hiến pháp, công dân đủ 18 tuổi có quyền bầu cử và đủ 21 tuổi có quyền ứng cử... Điều 2 Luật Bầu cử đại biểu Quốc hội cũng quy định tương tự.",
+                statements: [
+                    { text: "a) Việc quy định công dân đủ mười tám tuổi trở lên có quyền bầu cử... là thể hiện tính quyền lực bắt buộc chung của pháp luật.", answer: false },
+                    { text: "b) Các quy định của Luật Bầu cử đại biểu Quốc hội là căn cứ để xây dựng Điều 27 của Hiến pháp.", answer: false },
+                    { text: "c) Hiến pháp nước Cộng hòa XHCN Việt Nam năm 2013 khác với Luật Bầu cử đại biểu Quốc hội ở đối tượng điều chỉnh.", answer: true },
+                    { text: "d) Hiến pháp nước Cộng hòa XHCN Việt Nam năm 2013 quy định cụ thể trình tự, thủ tục cách thức để công dân thực hiện quyền bầu cử, ứng cử.", answer: false }
+                ]
+            },
+            {
+                q: "Bài 21 - Nhân dân thực hiện quyền lực nhà nước bằng dân chủ trực tiếp, dân chủ đại diện thông qua Quốc hội, Hội đồng nhân dân và thông qua các cơ quan khác của Nhà nước...",
+                statements: [
+                    { text: "a) Dân chủ trực tiếp là việc Nhân dân trực tiếp thực hiện quyền lực nhà nước bằng việc đi bầu cử đại biểu Quốc hội và hội đồng nhân dân.", answer: false },
+                    { text: "b) Dân chủ đại diện là hình thức Nhân dân thông qua các cơ quan nhà nước, các cá nhân được Nhân dân ủy quyền để thực hiện ý chí của Nhân dân.", answer: true },
+                    { text: "c) Mặt trận Tổ quốc và các thành viên là công cụ để người dân thực hiện quyền làm chủ của mình đối với nhà nước.", answer: false },
+                    { text: "d) Vấn đề dân chủ là vấn đề đã được Hiến pháp 2013 hiến định nên không được phép điều chỉnh nếu Hiến pháp chưa thay đổi.", answer: false }
+                ]
+            }
+        ];
+    }
+
+    // Utility: Xáo trộn mảng
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function goHome() {
+        document.getElementById('menu-screen').style.display = 'block';
+        document.getElementById('mode1-screen').style.display = 'none';
+        document.getElementById('mode2-screen').style.display = 'none';
+    }
+
+    // =================================================================
+    // LOGIC CHẾ ĐỘ 1: THI THỬ (Nhữ cũ)
+    // =================================================================
+    let currentMCQData = [];
+    let currentTFData = [];
+
+    function startMode1() {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('mode1-screen').style.display = 'block';
+        document.getElementById('result1').style.display = 'none';
+        document.getElementById('btn-submit').style.display = 'block';
+
+        currentMCQData = JSON.parse(JSON.stringify(getOriginalQuizData()));
+        currentTFData = JSON.parse(JSON.stringify(getTFQuizData()));
+        shuffleArray(currentMCQData);
+
+        renderMode1();
+    }
+
+    function renderMode1() {
+        const quizContainer = document.getElementById('quiz-container');
+        const tfContainer = document.getElementById('tf-container');
+        quizContainer.innerHTML = ''; tfContainer.innerHTML = '';
+
+        // Render MCQ
+        currentMCQData.forEach((item, index) => {
+            const qBlock = document.createElement('div');
+            qBlock.className = 'question-block';
+            qBlock.innerHTML = `<div class="question-title">Câu ${index + 1}: ${item.q}</div>`;
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+            item.options.forEach((opt, optIndex) => {
+                optionsDiv.innerHTML += `<label id="l1-mcq-${index}-${optIndex}"><input type="radio" name="m1-mcq${index}" value="${optIndex}"> ${opt}</label>`;
+            });
+            qBlock.appendChild(optionsDiv);
+            quizContainer.appendChild(qBlock);
+        });
+
+        // Render TF
+        currentTFData.forEach((item, qIndex) => {
+            const qBlock = document.createElement('div');
+            qBlock.className = 'question-block';
+            qBlock.innerHTML = `<div class="question-title">${item.q}</div>`;
+            item.statements.forEach((stmt, sIndex) => {
+                qBlock.innerHTML += `
+                    <div class="tf-statement">
+                        <p>${stmt.text}</p>
+                        <div class="tf-options">
+                            <label id="l1-tf-${qIndex}-${sIndex}-true"><input type="radio" name="m1-tf-${qIndex}-${sIndex}" value="true"> Đúng</label>
+                            <label id="l1-tf-${qIndex}-${sIndex}-false"><input type="radio" name="m1-tf-${qIndex}-${sIndex}" value="false"> Sai</label>
+                        </div>
+                    </div>`;
+            });
+            tfContainer.appendChild(qBlock);
+        });
+    }
+
+    function submitMode1() {
+        let scoreMCQ = 0, scoreTF = 0, totalTF = 0;
+
+        currentMCQData.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="m1-mcq${index}"]:checked`);
+            if (selected && parseInt(selected.value) === item.answer) {
+                scoreMCQ++;
+                document.getElementById(`l1-mcq-${index}-${item.answer}`).classList.add('correct');
+            } else {
+                if(selected) document.getElementById(`l1-mcq-${index}-${selected.value}`).classList.add('incorrect');
+                document.getElementById(`l1-mcq-${index}-${item.answer}`).classList.add('correct');
+            }
+        });
+
+        currentTFData.forEach((item, qIndex) => {
+            item.statements.forEach((stmt, sIndex) => {
+                totalTF++;
+                const selected = document.querySelector(`input[name="m1-tf-${qIndex}-${sIndex}"]:checked`);
+                const ansStr = stmt.answer.toString();
+                if (selected && selected.value === ansStr) {
+                    scoreTF++;
+                    document.getElementById(`l1-tf-${qIndex}-${sIndex}-${selected.value}`).classList.add('correct');
+                } else {
+                    if(selected) document.getElementById(`l1-tf-${qIndex}-${sIndex}-${selected.value}`).classList.add('incorrect');
+                    document.getElementById(`l1-tf-${qIndex}-${sIndex}-${ansStr}`).classList.add('correct');
+                }
+            });
+        });
+
+        document.getElementById('btn-submit').style.display = 'none';
+        const res = document.getElementById('result1');
+        res.style.display = 'block';
+        res.innerHTML = `Hoàn thành!<br>Trắc nghiệm: ${scoreMCQ}/${currentMCQData.length}<br>Đúng/Sai: ${scoreTF}/${totalTF} ý`;
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+
+    // =================================================================
+    // LOGIC CHẾ ĐỘ 2: LUYỆN TẬP TỪNG CÂU & LẶP LẠI (QUIZIZZ MODE)
+    // =================================================================
+    let flatMode2Data = []; // Chứa tất cả câu hỏi đã được làm phẳng
+    let currentQueue = [];  // Hàng đợi câu hỏi đang làm
+    let wrongQueue = [];    // Hàng đợi câu hỏi làm sai cần lặp lại
+    let m2CurrentIndex = 0;
+    let currentQuestionObj = null;
+    let roundNumber = 1;
+
+    function startMode2() {
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('mode2-screen').style.display = 'block';
+        document.getElementById('result2').style.display = 'none';
+        document.getElementById('m2-question-container').style.display = 'block';
+        document.querySelector('.m2-controls').style.display = 'block';
+
+        flatMode2Data = flattenAllData(); // Trộn MCQ và TF lại thành format chung
+        shuffleArray(flatMode2Data);
+        
+        currentQueue = [...flatMode2Data];
+        wrongQueue = [];
+        m2CurrentIndex = 0;
+        roundNumber = 1;
+
+        renderMode2Question();
+    }
+
+    // Chuyển Data TF thành các câu hỏi trắc nghiệm Yes/No đơn lẻ để dễ code vòng lặp
+    function flattenAllData() {
+        let arr = [];
+        getOriginalQuizData().forEach(q => arr.push({...q, type: 'mcq'}));
+        
+        getTFQuizData().forEach(block => {
+            block.statements.forEach(stmt => {
+                arr.push({
+                    q: `(ĐÚNG hay SAI)\n\nTình huống: ${block.q}\n\nNhận định: ${stmt.text}`,
+                    options: ["A. Đúng", "B. Sai"],
+                    answer: stmt.answer ? 0 : 1, // 0 = Đúng, 1 = Sai
+                    type: 'tf'
+                });
+            });
+        });
+        return arr;
+    }
+
+    function renderMode2Question() {
+        if (m2CurrentIndex >= currentQueue.length) {
+            handleRoundEnd();
+            return;
+        }
+
+        currentQuestionObj = currentQueue[m2CurrentIndex];
+        const totalThisRound = currentQueue.length;
+        
+        document.getElementById('mode2-progress').innerText = `Vòng ${roundNumber} - Câu ${m2CurrentIndex + 1} / ${totalThisRound} (Đang nợ: ${wrongQueue.length} câu)`;
+        
+        const container = document.getElementById('m2-question-container');
+        let html = `<div class="question-block">
+                        <div class="question-title">${currentQuestionObj.q}</div>
+                        <div class="options">`;
+        
+        currentQuestionObj.options.forEach((opt, idx) => {
+            html += `<label id="l2-opt-${idx}">
+                        <input type="radio" name="m2-ans" value="${idx}"> ${opt}
+                     </label>`;
+        });
+        html += `</div></div>`;
+        
+        container.innerHTML = html;
+
+        // Reset Buttons & Feedback
+        document.getElementById('btn-m2-check').style.display = 'inline-block';
+        document.getElementById('btn-m2-next').style.display = 'none';
+        const feedback = document.getElementById('m2-feedback');
+        feedback.style.display = 'none';
+        feedback.className = 'm2-feedback';
+    }
+
+    function checkMode2Answer() {
+        const selected = document.querySelector('input[name="m2-ans"]:checked');
+        if (!selected) {
+            alert("Vui lòng chọn một đáp án!");
+            return;
+        }
+
+        const selVal = parseInt(selected.value);
+        const correctAns = currentQuestionObj.answer;
+        const feedback = document.getElementById('m2-feedback');
+        
+        document.getElementById('btn-m2-check').style.display = 'none';
+        document.getElementById('btn-m2-next').style.display = 'inline-block';
+
+        // Disable tất cả radio
+        document.querySelectorAll('input[name="m2-ans"]').forEach(r => r.disabled = true);
+
+        if (selVal === correctAns) {
+            document.getElementById(`l2-opt-${selVal}`).classList.add('correct');
+            feedback.innerText = "✅ Chính xác!";
+            feedback.classList.add('m2-correct');
+            feedback.style.display = 'block';
+        } else {
+            document.getElementById(`l2-opt-${selVal}`).classList.add('incorrect');
+            document.getElementById(`l2-opt-${correctAns}`).classList.add('correct');
+            feedback.innerText = "❌ Sai rồi! Câu này sẽ được lưu lại để ôn tập sau.";
+            feedback.classList.add('m2-incorrect');
+            feedback.style.display = 'block';
+            
+            // Đẩy câu sai vào hàng đợi làm lại
+            wrongQueue.push(currentQuestionObj);
+        }
+    }
+
+    function nextMode2Question() {
+        m2CurrentIndex++;
+        renderMode2Question();
+    }
+
+    function handleRoundEnd() {
+        if (wrongQueue.length > 0) {
+            // Còn câu sai -> Bắt đầu vòng mới với các câu sai
+            alert(`Bạn đã hoàn thành vòng ${roundNumber}. Hệ thống ghi nhận có ${wrongQueue.length} câu sai. Chúng ta sẽ làm lại các câu sai nhé!`);
+            roundNumber++;
+            currentQueue = [...wrongQueue];
+            wrongQueue = [];
+            m2CurrentIndex = 0;
+            shuffleArray(currentQueue); // Đảo lại thứ tự câu sai cho bớt nhàm chán
+            renderMode2Question();
+        } else {
+            // Hết câu sai -> Hoàn thành tuyệt đối
+            document.getElementById('m2-question-container').style.display = 'none';
+            document.querySelector('.m2-controls').style.display = 'none';
+            document.getElementById('m2-feedback').style.display = 'none';
+            document.getElementById('mode2-progress').innerText = "Hoàn thành!";
+            
+            const res = document.getElementById('result2');
+            res.style.display = 'block';
+            res.innerHTML = `🎉 CHÚC MỪNG SƠN! 🎉<br><br>Bạn đã trả lời đúng TẤT CẢ các câu hỏi của bộ đề sau ${roundNumber} vòng lặp!<br>Kiến thức đã được ghim chặt. Sẵn sàng cho kỳ thi GK2 nhé!`;
+        }
+    }
+
+</script>
+
+</body>
+</html>
