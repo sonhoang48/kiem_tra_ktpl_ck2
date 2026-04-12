@@ -67,7 +67,7 @@
         input[type="radio"] { margin-right: 10px; }
         
         /* Reading Passage specific */
-        .reading-passage { background-color: #e8f4f8; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; font-style: italic; border-radius: 4px; color: #2c3e50; }
+        .reading-passage { background-color: #e8f4f8; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; font-style: italic; border-radius: 4px; color: #2c3e50; font-weight: normal; font-size: 1em; }
 
         /* TF specific */
         .tf-statement { margin-bottom: 15px; padding: 15px; background: #e9ecef; border-radius: 5px; }
@@ -95,7 +95,8 @@
         .result-box { text-align: center; margin-top: 20px; padding: 20px; background-color: #e8f8f5; border: 2px solid #2ecc71; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
     </style>
 </head>
-<body class="hide-q-prefix"> <button id="btn-toggle-prefix" onclick="document.body.classList.toggle('hide-q-prefix')">
+<body class="hide-q-prefix"> 
+<button id="btn-toggle-prefix" onclick="document.body.classList.toggle('hide-q-prefix')">
     👁️ Ẩn/Hiện Nguồn
 </button>
 
@@ -150,7 +151,6 @@
     // KHU VỰC DATA
     // =================================================================
     
-    // 1. DATA TRẮC NGHIỆM (MCQ)
     function getOriginalQuizData() {
         return [
             // BÀI 17
@@ -262,7 +262,6 @@
         ];
     }
 
-    // 2. DATA ĐỌC HIỂU (Reading Comprehension) ĐƯỢC CẬP NHẬT THEO YÊU CẦU
     function getRTQuizData() {
         return [
             {
@@ -303,11 +302,10 @@
         ];
     }
 
-    // 3. DATA ĐÚNG/SAI (TF)
     function getTFQuizData() {
         return [
             {
-                q: "Bài 17 - Phát hiện vi phạm tại nhà hàng X do bà H làm chủ. Ông D lập biên bản xử phạt và thu hồi giấy phép kinh doanh của bà H.",
+                q: "Bài 17 - Nhận được tin báo của quần chúng nhân dân về việc phát hiện có dấu hiệu vi phạm trong hoạt động chế biến thực phẩm tại nhà hàng X do bà H làm chủ. Ông D cán bộ cơ quan có thẩm quyền đã thành lập đoàn thanh tra đột xuất đối với toàn bộ quy trình chế biến và tiêu thụ tại cửa hàng của bà H. Trong quá trình thanh tra, cơ quan chức năng đã phát hiện bà H chủ nhà hàng X có hành vi sử dụng một số thực phẩm không có nguồn gốc xuất xứ, thực phẩm đã hết hạn sử dụng để chế biến thực phẩm cho khác hàng dẫn đến một khách hàng là anh M bị ngộ độc phải nhập viện điều trị nhiều ngày. Ngay sau đó ông D đã tiến hành lập biên bản xử phạt và thu hồi giấy phép kinh doanh của bà H.",
                 statements: [
                     { text: "a) Bà H không phải là chủ thể sản xuất nên không có nghĩa vụ phải chấp hành các quy định của pháp luật.", answer: false },
                     { text: "b) Ông D đã làm tốt vai trò là chủ thể nhà nước trong việc quản lý nhà nước đối với hoạt động kinh doanh.", answer: true },
@@ -316,7 +314,7 @@
                 ]
             },
             {
-                q: "Bài 18 - Xét Tờ trình của UBND tỉnh Hà Nam về việc đề nghị ban hành Nghị quyết... UBND tỉnh Hà Nam ban hành Nghị quyết...",
+                q: "Bài 18 - Căn cứ Luật Tổ chức chính quyền địa phương số 77/2015/QH13 đã được sửa đổi, bổ sung. Căn cứ Luật Ngân sách Nhà nước ngày 25 tháng 6 năm 2015. Căn cứ Thông tư số 08/2014/TT-BVHTTDL ngày 24 tháng 9 năm 2014 của Bộ Văn hóa, Thể thao và Du lịch quy định chi tiết tiêu chuẩn, trình tự, thủ tục xét và công nhận “Cơ quan đạt chuẩn văn hóa”, “Đơn vị đạt chuẩn văn hóa”, “Doanh nghiệp đạt chuẩn văn hóa”. Xét Tờ trình số 1718/TTr-UBND ngày 12 tháng 7 năm 2021 của Ủy ban nhân dân tỉnh Hà Nam về việc đề nghị ban hành Nghị quyết quy định mức tiền thưởng đối với cơ quan, đơn vị, doanh nghiệp đạt chuẩn văn hóa 5 năm liên tục trên địa bàn tỉnh Hà Nam. UBND tỉnh Hà Nam ban hành Nghị quyết Số: 01/2021/NQ-HĐND Quy định mức tiền thưởng đối với cơ quan, đơn vị, doanh nghiệp đạt chuẩn văn hóa 5 năm liên tục trên địa bàn tỉnh Hà Nam",
                 statements: [
                     { text: "a) Luật ngân sách Nhà nước là một ngành luật trong hệ thống pháp luật Việt Nam.", answer: true },
                     { text: "b) Thông tư của Bộ Văn hóa thể thao và du lịch không phải là văn bản pháp luật.", answer: false },
@@ -334,7 +332,7 @@
                 ]
             },
             {
-                q: "Bài 20 - Theo Điều 27 của Hiến pháp, công dân đủ 18 tuổi có quyền bầu cử và đủ 21 tuổi có quyền ứng cử... Điều 2 Luật Bầu cử đại biểu Quốc hội cũng quy định tương tự.",
+                q: "Bài 20 - Theo Điều 27 của Hiến pháp nước Cộng hòa XHCN Việt năm 2013, quy định: “Công dân đủ mười tám tuổi trở lên có quyền bầu cử và đủ hai mươi mốt tuổi trở lên có quyền ứng cử vào Quốc hội, Hội đồng nhân dân. Điều 2 Luật Bầu cử đại biểu Quốc hội và đại biểu Hội đồng nhân dân quy định: “Tính đến ngày bầu cử được công bố, công dân nước Cộng hòa xã hội chủ nghĩa Việt Nam đủ mười tám tuổi trở lên có quyền bầu cử và đủ hai mươi mốt tuổi trở lên có quyền ứng cử vào Quốc hội, Hội đồng nhân dân các cấp theo quy định của Luật này”.",
                 statements: [
                     { text: "a) Việc quy định công dân đủ mười tám tuổi trở lên có quyền bầu cử... là thể hiện tính quyền lực bắt buộc chung của pháp luật.", answer: false },
                     { text: "b) Các quy định của Luật Bầu cử đại biểu Quốc hội là căn cứ để xây dựng Điều 27 của Hiến pháp.", answer: false },
@@ -539,12 +537,22 @@
 
     function flattenAllData() {
         let arr = [];
-        getOriginalQuizData().forEach(q => arr.push({...q, type: 'mcq'}));
         
+        // 1. MCQ
+        getOriginalQuizData().forEach(q => arr.push({
+            passage: null, 
+            q: q.q, 
+            options: q.options, 
+            answer: q.answer, 
+            type: 'mcq'
+        }));
+        
+        // 2. ĐỌC HIỂU
         getRTQuizData().forEach(block => {
             block.questions.forEach(q => {
                 arr.push({
-                    q: `[ĐỌC HIỂU]\n\nThông tin: ${block.passage}\n\n${q.q}`,
+                    passage: `[ĐỌC HIỂU]\nThông tin: ${block.passage}`, 
+                    q: q.q,
                     options: q.options,
                     answer: q.answer,
                     type: 'mcq'
@@ -552,10 +560,12 @@
             });
         });
 
+        // 3. ĐÚNG / SAI
         getTFQuizData().forEach(block => {
             block.statements.forEach(stmt => {
                 arr.push({
-                    q: `(ĐÚNG hay SAI)\n\nTình huống: ${block.q}\n\nNhận định: ${stmt.text}`,
+                    passage: `[TÌNH HUỐNG]\n${block.q}`, 
+                    q: `Nhận định: ${stmt.text}`,
                     options: ["A. Đúng", "B. Sai"],
                     answer: stmt.answer ? 0 : 1, 
                     type: 'tf'
@@ -577,9 +587,16 @@
         document.getElementById('mode2-progress').innerText = `Vòng ${roundNumber} - Câu ${m2CurrentIndex + 1} / ${totalThisRound} (Đang nợ: ${wrongQueue.length} câu)`;
         
         const container = document.getElementById('m2-question-container');
-        let html = `<div class="question-block">
-                        <div class="question-title">Câu ${m2CurrentIndex + 1}. ${formatQuestion(currentQuestionObj.q)}</div>
-                        <div class="options">`;
+        
+        let html = `<div class="question-block">`;
+        
+        // Thêm hộp hiển thị đoạn văn / tình huống nếu có (Dành cho Đọc hiểu hoặc Đúng/Sai)
+        if (currentQuestionObj.passage) {
+            html += `<div class="reading-passage">${formatQuestion(currentQuestionObj.passage).replace(/\n/g, '<br>')}</div>`;
+        }
+        
+        html += `<div class="question-title">Câu ${m2CurrentIndex + 1}. ${formatQuestion(currentQuestionObj.q)}</div>
+                 <div class="options">`;
         
         currentQuestionObj.options.forEach((opt, idx) => {
             html += `<label id="l2-opt-${idx}">
